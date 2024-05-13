@@ -2,6 +2,7 @@ package com.ebanx.springapi.model;
 
 public class Event {
     private String type;
+    private String origin;
     private String destination;
     private float amount;
 
@@ -9,11 +10,14 @@ public class Event {
         return type;
     }
 
+    public String getOrigin() {
+        return origin;
+    }
+
 
     public String getDestination() {
         return destination;
     }
-
 
     public float getAmount() {
         return amount;

@@ -27,17 +27,47 @@ public class AccountController {
                 if (account.getId() == null) {
                     account.setId(event.getDestination());
                 }
-                float balance = account.getBalance();
-                account.setBalance(balance + event.getAmount());
+                account.setBalance(account.getBalance() + event.getAmount());
                 accounts.put(event.getDestination(), account);
                 return ResponseEntity.status(HttpStatus.CREATED).body(account);
+
+            case "withdraw":
+                Account accountWithdraw = accounts.get(event.getOrigin());
+                if (accountWithdraw == null) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0);
+                }
+                if (accountWithdraw.getBalance() < event.getAmount()) {
+                    return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(0);
+                }
+                accountWithdraw.setBalance(accountWithdraw.getBalance() - event.getAmount());
+                accounts.put(event.getOrigin(), accountWithdraw);
+                return ResponseEntity.status(HttpStatus.CREATED).body(accountWithdraw);
+            case "transfer":
+                Account accountOrigin = accounts.get(event.getOrigin());
+                Account accountDestination = accounts.getOrDefault(event.getDestination(), new Account());
+                if (accountOrigin == null || accountOrigin.getBalance() < event.getAmount()) {
+                    return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(0);
+                }
+                if (accountDestination.getId() == null) {
+                    accountDestination.setId(event.getDestination());
+                }
+                accountOrigin.setBalance(accountOrigin.getBalance() - event.getAmount());
+                accountDestination.setBalance(accountDestination.getBalance() + event.getAmount());
+                accounts.put(event.getOrigin(), accountOrigin);
+                accounts.put(event.getDestination(), accountDestination);
+                return ResponseEntity.status(HttpStatus.CREATED).body(accountOrigin);
             default:
                 return null;
         }
     }
 
     @GetMapping("/balance")
-    public void Balance(@RequestParam(value = "account_id") Long account_id) {
-        // return pegar a conta com base no id e getBalance();
+    public ResponseEntity<Object> Balance(@RequestParam(value = "account_id") String account_id) {
+        Account account = accounts.get(account_id);
+        if (account == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0);
+        } else {
+            return ResponseEntity.ok(account.getBalance());
+        }
     }
 }
