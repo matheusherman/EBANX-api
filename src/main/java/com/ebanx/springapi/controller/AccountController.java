@@ -46,7 +46,7 @@ public class AccountController {
                 accounts.put(event.getOrigin(), accountWithdraw);
                 Map<String, Object> withdrawResponse = new HashMap<>();
                 withdrawResponse.put("origin", accountWithdraw);
-                return ResponseEntity.status(HttpStatus.CREATED).body(withdrawResponse  );
+                return ResponseEntity.status(HttpStatus.CREATED).body(withdrawResponse);
             case "transfer":
                 Account accountOrigin = accounts.get(event.getOrigin());
                 if (accountOrigin == null) {

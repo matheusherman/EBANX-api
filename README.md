@@ -25,8 +25,8 @@ EBANX Software Engineer Take-home assignment. This project showcases my skills i
 │   ├── main
 │   │   ├── java
 │   │   │   └── com
-│   │   │       └── example
-│   │   │           └── ebanx
+│   │   │       └── ebanx
+│   │   │           └── springapi
 │   │   │               ├── controller
 │   │   │               │   └── AccountController.java
 │   │   │               ├── model
@@ -38,8 +38,8 @@ EBANX Software Engineer Take-home assignment. This project showcases my skills i
 │   └── test
 │       └── java
 │           └── com
-│               └── example
-│                   └── ebanx
+│               └── ebanx
+│                   └── springapi
 │                       └── SpringApiApplication.java
 └── README.md
 ```
