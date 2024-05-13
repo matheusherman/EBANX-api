@@ -10,8 +10,6 @@ EBANX Software Engineer Take-home assignment. This project showcases my skills i
 - [Project Structure](#project-structure)
 - [Endpoints](#endpoints)
 - [Getting Started](#getting-started)
-- [Running Tests](#running-tests)
-- [Version Control](#version-control)
 
 ## Requirements
 
@@ -31,15 +29,10 @@ EBANX Software Engineer Take-home assignment. This project showcases my skills i
 │   │   │           └── ebanx
 │   │   │               ├── controller
 │   │   │               │   └── AccountController.java
-│   │   │               ├── service
-│   │   │               │   └── AccountService.java
 │   │   │               ├── model
 │   │   │               │   └── Account.java
-│   │   │               ├── dto
-│   │   │               │   └── EventDTO.java
-│   │   │               ├── exception
-│   │   │               │   └── AccountNotFoundException.java
-│   │   │               └── EbanxApplication.java
+│   │   │               │   └── Event.java
+│   │   │               └── SpringApiApplication.java
 │   │   └── resources
 │   │       └── application.properties
 │   └── test
@@ -47,7 +40,7 @@ EBANX Software Engineer Take-home assignment. This project showcases my skills i
 │           └── com
 │               └── example
 │                   └── ebanx
-│                       └── EbanxApplicationTests.java
+│                       └── SpringApiApplication.java
 └── README.md
 ```
 
@@ -90,7 +83,7 @@ Content-Type: application/json
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/ebanx-assignment.git
+   git clone https://github.com/matheusherman/EBANX-api.git
    cd ebanx-assignment
    ```
 
@@ -109,24 +102,3 @@ Content-Type: application/json
    http://localhost:8080
    ```
 
-## Running Tests
-
-To run the provided test suite, use the following command:
-
-```bash
-mvn test
-```
-
-The tests include scenarios such as creating accounts, making deposits, withdrawing funds, and transferring balances between accounts.
-
-## Version Control
-
-The project follows best practices in version control, with meaningful commit messages documenting the step-by-step development process. You can explore the commit history to understand the evolution of the project.
-
-## Conclusion
-
-This project demonstrates my ability to create a simple yet effective REST API using Java and Spring Boot. I focused on keeping the codebase clean, well-structured, and easy to modify, ensuring it meets the requirements outlined in the challenge.
-
-For any questions or further clarifications, please feel free to reach out.
-
-Happy coding!
