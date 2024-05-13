@@ -30,7 +30,9 @@ public class AccountController {
                 }
                 account.setBalance(account.getBalance() + event.getAmount());
                 accounts.put(event.getDestination(), account);
-                return ResponseEntity.status(HttpStatus.CREATED).body(account);
+                Map<String, Object> depositResponse = new HashMap<>();
+                depositResponse.put("destination", account);
+                return ResponseEntity.status(HttpStatus.CREATED).body(depositResponse);
 
             case "withdraw":
                 Account accountWithdraw = accounts.get(event.getOrigin());
@@ -42,7 +44,9 @@ public class AccountController {
                 }
                 accountWithdraw.setBalance(accountWithdraw.getBalance() - event.getAmount());
                 accounts.put(event.getOrigin(), accountWithdraw);
-                return ResponseEntity.status(HttpStatus.CREATED).body(accountWithdraw);
+                Map<String, Object> withdrawResponse = new HashMap<>();
+                withdrawResponse.put("origin", accountWithdraw);
+                return ResponseEntity.status(HttpStatus.CREATED).body(withdrawResponse  );
             case "transfer":
                 Account accountOrigin = accounts.get(event.getOrigin());
                 if (accountOrigin == null) {
@@ -59,9 +63,12 @@ public class AccountController {
                 accountDestination.setBalance(accountDestination.getBalance() + event.getAmount());
                 accounts.put(event.getOrigin(), accountOrigin);
                 accounts.put(event.getDestination(), accountDestination);
-                return ResponseEntity.status(HttpStatus.CREATED).body(accountOrigin);
+                Map<String, Object> transferResponse = new HashMap<>();
+                transferResponse.put("origin", accountOrigin);
+                transferResponse.put("destination", accountDestination);
+                return ResponseEntity.status(HttpStatus.CREATED).body(transferResponse);
             default:
-                return null;
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Entry Type");
         }
     }
 
