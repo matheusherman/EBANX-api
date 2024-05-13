@@ -30,7 +30,9 @@ public class AccountController {
                 }
                 account.setBalance(account.getBalance() + event.getAmount());
                 accounts.put(event.getDestination(), account);
-                return ResponseEntity.status(HttpStatus.CREATED).body(account);
+                Map<String, Object> depositResponse = new HashMap<>();
+                depositResponse.put("destination", account);
+                return ResponseEntity.status(HttpStatus.CREATED).body(depositResponse);
 
             case "withdraw":
                 Account accountWithdraw = accounts.get(event.getOrigin());
