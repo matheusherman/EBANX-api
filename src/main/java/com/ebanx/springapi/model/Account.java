@@ -1,15 +1,15 @@
 package com.ebanx.springapi.model;
 
 public class Account {
-    private Long id;
+    private String account_id;
     private float balance;
 
-    public Long getId() {
-        return id;
+    public String getId() {
+        return account_id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setId(String account_id) {
+        this.account_id = account_id;
     }
 
     public float getBalance() {
