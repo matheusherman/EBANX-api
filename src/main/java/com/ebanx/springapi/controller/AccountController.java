@@ -15,8 +15,9 @@ public class AccountController {
     private Map<String, Account> accounts = new HashMap<>();
 
     @PostMapping("/reset")
-    public void reset() {
+    public ResponseEntity<Object> reset() {
         accounts.clear();
+        return ResponseEntity.status(HttpStatus.OK).body("OK");
     }
 
     @PostMapping("/event")
@@ -44,6 +45,9 @@ public class AccountController {
                 return ResponseEntity.status(HttpStatus.CREATED).body(accountWithdraw);
             case "transfer":
                 Account accountOrigin = accounts.get(event.getOrigin());
+                if (accountOrigin == null) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0);
+                }
                 Account accountDestination = accounts.getOrDefault(event.getDestination(), new Account());
                 if (accountOrigin == null || accountOrigin.getBalance() < event.getAmount()) {
                     return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(0);
