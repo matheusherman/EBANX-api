@@ -12,7 +12,7 @@ import java.util.Map;
 @RestController
 public class AccountController {
 
-    private Map<String, Account> accounts = new HashMap<>();
+    private final Map<String, Account> accounts = new HashMap<>();
 
     @PostMapping("/reset")
     public ResponseEntity<Object> reset() {
@@ -48,10 +48,10 @@ public class AccountController {
                 if (accountOrigin == null) {
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0);
                 }
-                Account accountDestination = accounts.getOrDefault(event.getDestination(), new Account());
-                if (accountOrigin == null || accountOrigin.getBalance() < event.getAmount()) {
+                if (accountOrigin.getBalance() < event.getAmount()) {
                     return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(0);
                 }
+                Account accountDestination = accounts.getOrDefault(event.getDestination(), new Account());
                 if (accountDestination.getId() == null) {
                     accountDestination.setId(event.getDestination());
                 }
