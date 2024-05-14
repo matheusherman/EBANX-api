@@ -2,6 +2,7 @@ package com.ebanx.springapi.controller;
 
 import com.ebanx.springapi.model.Account;
 import com.ebanx.springapi.model.Event;
+import com.ebanx.springapi.service.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +13,11 @@ import java.util.Map;
 @RestController
 public class AccountController {
 
-    private final Map<String, Account> accounts = new HashMap<>();
+    private final AccountService accountService;
+
+    public AccountController(AccountService accountService) {
+        this.accountService = accountService;
+    }
 
     /**
      * Resets the state of the application by clearing all accounts.
@@ -20,11 +25,10 @@ public class AccountController {
      * @return a ResponseEntity with status OK and body "OK"
      */
     @PostMapping("/reset")
-    public ResponseEntity<Object> reset() {
-        accounts.clear();
+    public ResponseEntity<String> reset() {
+        accountService.resetAccounts();
         return ResponseEntity.status(HttpStatus.OK).body("OK");
     }
-
 
     /**
      * Processes an incoming event by delegating to the appropriate handler based on event type.
@@ -47,30 +51,13 @@ public class AccountController {
     }
 
     /**
-     * Retrieves an existing account or creates a new one if it does not exist.
-     *
-     * @param accountId the ID of the account to retrieve or create
-     * @return the retrieved or newly created Account
-     */
-    private Account getOrCreateAccount(String accountId) {
-        Account account = accounts.getOrDefault(accountId, new Account());
-        if (account.getId() == null) {
-            account.setId(accountId);
-        }
-        return account;
-    }
-
-    /**
      * Handles deposit events by updating the account balance and returning the updated account.
      *
      * @param event the deposit event containing account destination and amount
      * @return a ResponseEntity containing the updated account with status CREATED
      */
     private ResponseEntity<Object> handleDeposit(Event event) {
-        Account account = getOrCreateAccount(event.getDestination());
-        account.setBalance(account.getBalance() + event.getAmount());
-        accounts.put(event.getDestination(), account);
-
+        Account account = accountService.deposit(event.getDestination(), event.getAmount());
         Map<String, Object> response = new HashMap<>();
         response.put("destination", account);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -83,16 +70,13 @@ public class AccountController {
      * @return a ResponseEntity containing the updated account with status CREATED, or an error status if the account does not exist or has insufficient funds
      */
     private ResponseEntity<Object> handleWithdraw(Event event) {
-        Account account = accounts.get(event.getOrigin());
+        Account account = accountService.withdraw(event.getOrigin(), event.getAmount());
         if (account == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0);
         }
         if (account.getBalance() < event.getAmount()) {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(0);
         }
-        account.setBalance(account.getBalance() - event.getAmount());
-        accounts.put(event.getOrigin(), account);
-
         Map<String, Object> response = new HashMap<>();
         response.put("origin", account);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -105,38 +89,31 @@ public class AccountController {
      * @return a ResponseEntity containing the updated accounts with status CREATED, or an error status if the origin account does not exist or has insufficient funds
      */
     private ResponseEntity<Object> handleTransfer(Event event) {
-        Account accountOrigin = accounts.get(event.getOrigin());
-        if (accountOrigin == null) {
+        Map<String, Account> accounts = accountService.transfer(event.getOrigin(), event.getDestination(), event.getAmount());
+        if (accounts == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0);
         }
-        if (accountOrigin.getBalance() < event.getAmount()) {
+        if (accounts.get("origin").getBalance() < event.getAmount()) {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(0);
         }
-        Account accountDestination = getOrCreateAccount(event.getDestination());
-        accountOrigin.setBalance(accountOrigin.getBalance() - event.getAmount());
-        accountDestination.setBalance(accountDestination.getBalance() + event.getAmount());
-        accounts.put(event.getOrigin(), accountOrigin);
-        accounts.put(event.getDestination(), accountDestination);
-
         Map<String, Object> response = new HashMap<>();
-        response.put("origin", accountOrigin);
-        response.put("destination", accountDestination);
+        response.put("origin", accounts.get("origin"));
+        response.put("destination", accounts.get("destination"));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     /**
      * Retrieves the balance of a specified account.
      *
-     * @param account_id the ID of the account whose balance is to be retrieved
+     * @param accountId the ID of the account whose balance is to be retrieved
      * @return a ResponseEntity containing the account balance or a status of NOT FOUND if the account does not exist
      */
     @GetMapping("/balance")
-    public ResponseEntity<Object> Balance(@RequestParam(value = "account_id") String account_id) {
-        Account account = accounts.get(account_id);
+    public ResponseEntity<Object> getBalance(@RequestParam(value = "account_id") String accountId) {
+        Account account = accountService.getAccount(accountId);
         if (account == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0);
-        } else {
-            return ResponseEntity.ok(account.getBalance());
         }
+        return ResponseEntity.ok(account.getBalance());
     }
 }
