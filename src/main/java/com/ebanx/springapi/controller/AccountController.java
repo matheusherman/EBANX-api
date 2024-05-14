@@ -34,11 +34,16 @@ public class AccountController {
         }
     }
 
-    private ResponseEntity<Object> handleDeposit(Event event) {
-        Account account = accounts.getOrDefault(event.getDestination(), new Account());
+    private Account getOrCreateAccount(String accountId) {
+        Account account = accounts.getOrDefault(accountId, new Account());
         if (account.getId() == null) {
-            account.setId(event.getDestination());
+            account.setId(accountId);
         }
+        return account;
+    }
+
+    private ResponseEntity<Object> handleDeposit(Event event) {
+        Account account = getOrCreateAccount(event.getDestination());
         account.setBalance(account.getBalance() + event.getAmount());
         accounts.put(event.getDestination(), account);
 
@@ -71,10 +76,7 @@ public class AccountController {
         if (accountOrigin.getBalance() < event.getAmount()) {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(0);
         }
-        Account accountDestination = accounts.getOrDefault(event.getDestination(), new Account());
-        if (accountDestination.getId() == null) {
-            accountDestination.setId(event.getDestination());
-        }
+        Account accountDestination = getOrCreateAccount(event.getDestination());
         accountOrigin.setBalance(accountOrigin.getBalance() - event.getAmount());
         accountDestination.setBalance(accountDestination.getBalance() + event.getAmount());
         accounts.put(event.getOrigin(), accountOrigin);
